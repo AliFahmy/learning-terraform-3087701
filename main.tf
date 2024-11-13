@@ -89,7 +89,7 @@ module "blog_autoscaling" {
   security_groups = [module.blog_sg.security_group_id]
 
 
-  image_id          = data.aws_ami.app_ami
+  image_id          = data.aws_ami.app_ami.id
   instance_type     = var.instance_type
   target_group_arns   = module.blog_alb.target_group_arns
   tags = {
