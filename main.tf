@@ -33,7 +33,6 @@ module "blog_vpc" {
 resource "aws_instance" "blog" {
   ami           = data.aws_ami.app_ami.id
   instance_type = var.instance_type
-  count = 1
 
   vpc_security_group_ids = [module.blog_sg.security_group_id]
   subnet_id = module.blog_vpc.public_subnets[0]
@@ -46,48 +45,34 @@ module "alb" {
   source = "terraform-aws-modules/alb/aws"
 
   name    = "blog-alb"
+  
+  load_balancer_type = "application"
+  
   vpc_id  = module.blog_vpc.vpc_id
   subnets = module.blog_vpc.public_subnets
   security_groups = [module.blog_sg.security_group_id]
 
-  target_groups = {
-    blog-instance = {
-      name_prefix      = "blog"
-      protocol         = "HTTP"
-      port             = 80
+  
+  target_groups = [
+    {
+      name_prefix      = "blog-"
+      backend_protocol = "HTTP"
+      backend_port     = 80
       target_type      = "instance"
-      target_id        = aws_instance.blog[count.index].id
     }
-  }
+  ]
+
+  http_tcp_listeners = [
+    {
+      port               = 80
+      protocol           = "HTTP"
+      target_group_index = 0
+    }
+  ]
 
   tags = {
     Environment = "dev"
   }
-}
-
-
-resource "aws_lb_target_group" "blog_tg" {
-  name = "blog-target-group"
-  port = 80
-  protocol = "HTTP"
-  vpc_id = module.blog_vpc.vpc_id
-  target_type = "instance"
-}
-resource "aws_lb_listener" "blog_alb_listener" {
- load_balancer_arn = module.alb.arn
- port              = "80"
- protocol          = "HTTP"
-
- default_action {
-   type             = "forward"
-   target_group_arn = aws_lb_target_group.blog_tg.arn
- }
-}
-
-resource "aws_lb_target_group_attachment" "blog-tg-attachement" {
-  count = length(aws_instance.blog)
-  target_group_arn = aws_lb_target_group.blog_tg.arn
-  target_id = aws_instance.blog[count.index].id
 }
 
 
