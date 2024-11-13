@@ -30,7 +30,7 @@ module "blog_vpc" {
   }
 }
 
-resource "aws_instance" "web" {
+resource "aws_instance" "blog" {
   ami           = data.aws_ami.app_ami.id
   instance_type = var.instance_type
 
@@ -38,6 +38,29 @@ resource "aws_instance" "web" {
   subnet_id = module.blog_vpc.public_subnets[0]
   tags = {
     Name = "HelloWorld"
+  }
+}
+
+module "alb" {
+  source = "terraform-aws-modules/alb/aws"
+
+  name    = "blog-alb"
+  vpc_id  = module.blog_vpc.vpc_id
+  subnets = module.blog_vpc.public_subnets
+  security_groups = [module.blog_sg.security_group_id]
+
+  target_groups = {
+    blog-instance = {
+      name_prefix      = "blog"
+      protocol         = "HTTP"
+      port             = 80
+      target_type      = "instance"
+      target_id        = aws_instance.blog.id
+    }
+  }
+
+  tags = {
+    Environment = "dev"
   }
 }
 
