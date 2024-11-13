@@ -1,0 +1,40 @@
+# Local Terraform state
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# Terraform variable override files
+# These can contain sensitive information that shouldn't be version-controlled.
+*.tfvars
+*.tfvars.json
+
+# Ignore any auto-generated local provider plugins
+.terraform/
+
+# Terraform plan files (often contain sensitive information)
+*.tfplan
+
+# .terraform.lock.hcl keeps track of provider dependencies' versions
+# Exclude only if you prefer to manage provider versions manually.
+# Uncomment the line below if you want to ignore it:
+# .terraform.lock.hcl
+
+# Sensitive files containing secrets (if any exist in your workflow)
+secret.auto.tfvars
+
+# Ignore IDE or editor-specific files (common examples below)
+# For VS Code
+.vscode/
+# For IntelliJ
+.idea/
+# For Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+*.hcl
