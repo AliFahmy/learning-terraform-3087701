@@ -71,7 +71,7 @@ resource "aws_lb_listener" "blog_alb_listener" {
 
  default_action {
    type             = "forward"
-   target_group_arn = module.alb.target_groups[0]
+   target_group_arn = module.alb.target_groups["blog-instance"]
  }
 }
 
