@@ -59,6 +59,13 @@ module "alb" {
     }
   }
 
+  listeners = {
+    http ={
+      port = 80
+      protocol= "HTTP"
+    }
+  }
+
   tags = {
     Environment = "dev"
   }
