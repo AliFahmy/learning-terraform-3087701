@@ -64,6 +64,14 @@ module "alb" {
   }
 }
 
+
+resource "aws_lb_target_group" "blog_tg" {
+  name = "blog-target-group"
+  port = 80
+  protocol = "HTTP"
+  vpc_id = module.blog_vpc.vpc_id
+  target_type = "instance"
+}
 resource "aws_lb_listener" "blog_alb_listener" {
  load_balancer_arn = module.alb.arn
  port              = "80"
@@ -71,8 +79,14 @@ resource "aws_lb_listener" "blog_alb_listener" {
 
  default_action {
    type             = "forward"
-   target_group_arn = module.alb.target_groups["blog-instance"]
+   target_group_arn = aws_lb_target_group.blog_tg.arn
  }
+}
+
+resource "aws_lb_target_group_attachment" "blog-tg-attachement" {
+  count = length(aws_instance.blog)
+  target_group_arn = aws_lb_target_group.blog_tg.arn
+  target_id = aws_instance.blog[count.index].id
 }
 
 
